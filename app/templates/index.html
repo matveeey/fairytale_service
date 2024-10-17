@@ -2,28 +2,19 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>CurlPy Transformer</title>
+        <title>Story Generator</title>
         <link rel="stylesheet" type="text/css" href="/static/style.css">
     </head>
     <body>
         <div class="container">
-        <h1>CurlPy Transformer</h1>
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('curl')">cURL</button>
-            <button class="tab" onclick="switchTab('fetch')">Fetch</button>
-        </div>
-        <textarea id="input" placeholder="Введите ваш запрос здесь..."></textarea>
-        <div class="controls">
-            <select id="format">
-            <option value="requests">Requests</option>
-            <option value="httpx">HTTPX</option>
-            </select>
-            <button onclick="convertToPython()">CONVERT TO PYTHON</button>
-        </div>
-        <pre id="output"></pre>
+            <h1>Story Generator</h1>
+            <textarea id="characters" placeholder="Введите имена персонажей через запятую..."></textarea>
+            <div class="controls">
+                <button onclick="generateStory()">Generate</button>
+            </div>
+            <pre id="output"></pre>
         </div>
 
         <script src="/static/script.js"></script>
-
     </body>
 </html>

@@ -1,52 +1,31 @@
-def execute_request(context, target):
-    method = context.method.upper()
-    url = context.url
-    headers = dict(context.headers) if context.headers else None
-    if isinstance(headers, dict):
-        try:
-            del headers['Accept-Encoding']
-        except:
-            pass
+import openai
 
-    data = dict(context.data) if context.data else None
-    cookies = dict(context.cookies) if context.cookies else None
+def execute_request(characters):
+    # Задаем значения по умолчанию для длины сказки
+    print(characters)
+    story_length = 300
 
-    if target == "httpx":
-        return f'''import httpx
-import asyncio
+    # Настройка клиента для работы с локальной LLM
+    client = openai.OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
 
+    # Формирование запроса к LLM
+    prompt = f"Создай сказку с персонажами: {', '.join(characters)}. Сказка должна быть примерно {story_length} слов в длину."
 
-async def fetch():
-    async with httpx.AsyncClient() as client:
-        response = await client.request(
-            method="{method}",
-            url="{url}",
-            headers={headers},
-            data={data},
-            cookies={cookies}
+    try:
+        # Отправка запроса к LLM
+        completion = client.chat.completions.create(
+            model="model-identifier",  # Замените на идентификатор вашей модели
+            messages=[
+                {"role": "system", "content": "You are a storyteller."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=story_length  # Установите максимальное количество токенов, если необходимо
         )
-        return response.text
 
+        # Получение и возврат сгенерированной сказки
+        story = completion.choices[0].message.content
+        return story
 
-rez = asyncio.run(fetch())
-print(rez)
-'''
-    elif target == "requests":
-        return f'''import requests
-
-def fetch():
-    response = requests.request(
-        method="{method}",
-        url="{url}",
-        headers={headers},
-        data={data},
-        cookies={cookies}
-    )
-    return response.text
-
-
-rez = fetch()
-print(rez)
-'''
-    else:
-        raise ValueError("Unsupported target")
+    except Exception as e:
+        raise ValueError(f"Error generating story: {str(e)}")
