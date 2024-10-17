@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
 from .schemas import CharacterRequest
 from .utils import generate_story
 
@@ -11,8 +12,7 @@ async def generate_story_endpoint(request_body: CharacterRequest):
         character_list = [name.strip() for name in request_body.characters.split(',')]
 
         # Вызов функции для генерации сказки
-        story = generate_story(character_list)
-        return {"story": story}
+        return StreamingResponse(generate_story(character_list), media_type='text/plain')
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

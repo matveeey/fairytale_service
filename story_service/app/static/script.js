@@ -15,9 +15,19 @@ async function generateStory() {
             throw new Error('Network response was not ok');
         }
 
-        const data = await response.json();
-        console.log('Received data:', data);  // Добавляем логирование для отладки
-        output.innerHTML = `${data.story}<button class="copy-btn" onclick="copyToClipboard()">Копировать</button>`;
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let story = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+                break;
+            }
+            const chunk = decoder.decode(value, { stream: true });
+            story += chunk;
+            output.innerHTML = `${story}<button class="copy-btn" onclick="copyToClipboard()">Копировать</button>`;
+        }
     } catch (error) {
         output.textContent = 'Произошла ошибка при генерации сказки. Пожалуйста, попробуйте еще раз.';
         console.error('Error:', error);
