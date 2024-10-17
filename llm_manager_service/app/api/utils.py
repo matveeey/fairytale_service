@@ -1,6 +1,7 @@
 from langchain_openai import OpenAI
+import asyncio
 
-async def generate_story(characters):
+async def generate_story(characters, websocket):
     # Задаем значения по умолчанию для длины сказки
     story_length = 300
 
@@ -12,8 +13,8 @@ async def generate_story(characters):
 
     try:
         async for chunk in client.astream(prompt):
-                    print(chunk, end="|", flush=True)  # Отладочный вывод
-                    yield chunk
+            print(chunk, end="|", flush=True)  # Отладочный вывод
+            await websocket.send_text(chunk)
 
     except Exception as e:
         raise ValueError(f"Error generating story: {str(e)}")

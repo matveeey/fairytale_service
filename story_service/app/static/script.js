@@ -1,37 +1,15 @@
+const socket = new WebSocket('ws://localhost:8001/api/generate_story');
+const output = document.getElementById('output');
+
+socket.onmessage = function(event) {
+    const chunk = event.data;
+    output.innerHTML += chunk;
+    output.innerHTML += '<button class="copy-btn" onclick="copyToClipboard()">Копировать</button>';
+};
+
 async function generateStory() {
     const characters = document.getElementById('characters').value;
-    const output = document.getElementById('output');
-
-    try {
-        const response = await fetch('/api', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ characters: characters }),
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let story = '';
-
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) {
-                break;
-            }
-            const chunk = decoder.decode(value, { stream: true });
-            story += chunk;
-            output.innerHTML = `${story}<button class="copy-btn" onclick="copyToClipboard()">Копировать</button>`;
-        }
-    } catch (error) {
-        output.textContent = 'Произошла ошибка при генерации сказки. Пожалуйста, попробуйте еще раз.';
-        console.error('Error:', error);
-    }
+    socket.send(JSON.stringify({ characters: characters }));
 }
 
 function copyToClipboard() {

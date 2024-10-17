@@ -1,18 +1,22 @@
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from .schemas import CharacterRequest
 from .utils import generate_story
 
 router = APIRouter(prefix='/api', tags=['API'])
 
-@router.post('/generate_story', summary='Генерация сказки')
-async def generate_story_endpoint(request_body: CharacterRequest):
+@router.websocket('/generate_story')
+async def generate_story_endpoint(websocket: WebSocket):
+    await websocket.accept()
     try:
-        # Парсинг имен персонажей
-        character_list = [name.strip() for name in request_body.characters.split(',')]
+        while True:
+            data = await websocket.receive_json()
+            characters = data.get('characters')
+            if not characters:
+                await websocket.send_json({"error": "No characters provided"})
+                continue
 
-        # Вызов функции для генерации сказки
-        return StreamingResponse(generate_story(character_list), media_type='text/plain')
+            character_list = [name.strip() for name in characters.split(',')]
+            await generate_story(character_list, websocket)
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except WebSocketDisconnect:
+        print("WebSocket disconnected")
