@@ -16,10 +16,10 @@ async def get_main_page(request: Request):
 @router.post('/api', summary='Основной API метод')
 async def main_logic(request_body: CharacterRequest):
     try:
-        # Парсинг имен персонажей
+        # Actors name parsing
         character_list = [name.strip() for name in request_body.characters.split(',')]
 
-        # Вызов функции для генерации сказки
+        # Story generation
         story = execute_request(character_list)
         return {"story": story}
 

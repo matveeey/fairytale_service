@@ -1,4 +1,8 @@
 fastapi[all]
 requests
 httpx
-curl_fetch2py
+pydantic
+openai
+streamlit
+langchain
+langchain_openai

@@ -16,6 +16,7 @@ async function generateStory() {
         }
 
         const data = await response.json();
+        console.log('Received data:', data);  // Добавляем логирование для отладки
         output.innerHTML = `${data.story}<button class="copy-btn" onclick="copyToClipboard()">Копировать</button>`;
     } catch (error) {
         output.textContent = 'Произошла ошибка при генерации сказки. Пожалуйста, попробуйте еще раз.';
