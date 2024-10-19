@@ -1,20 +1,63 @@
 from langchain_openai import OpenAI
 import asyncio
+import os
+import aiohttp
+import websockets
+import json
+
+def build_json_payload(model_uri, temperature, max_tokens, system_message, user_message):
+    return {
+        "modelUri": model_uri,
+        "completionOptions": {
+            "stream": True,
+            "temperature": temperature,
+            "maxTokens": max_tokens
+        },
+        "messages": [
+            {
+                "role": "system",
+                "text": system_message
+            },
+            {
+                "role": "user",
+                "text": user_message
+            }
+        ]
+    }
+
+async def send_completion_request(iam_token, folder_id, prompt_data, websocket):
+    url = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+    
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {iam_token}",
+        "x-folder-id": folder_id
+    }
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, headers=headers, json=prompt_data) as response:
+            if response.status == 200:
+                async for chunk in response.content.iter_any():
+                    chunk_str = chunk.decode('utf-8')
+                    print(chunk_str, end="|", flush=True)  # Отладочный вывод
+                    await websocket.send_text(chunk_str)
+            else:
+                raise Exception(f"Request failed with status code {response.status}: {await response.text()}")
 
 async def generate_story(characters, websocket):
+    IAM_TOKEN = os.environ["IAM_TOKEN"]
+    FOLDER_ID = os.environ["FOLDER_ID"]
     # Задаем значения по умолчанию для длины сказки
+    model_uri = f"gpt://{FOLDER_ID}/yandexgpt-lite"
+    temperature = 0.6
+    max_tokens = "2000"
     story_length = 300
+    system_message = f"Создай сказку с персонажами: {', '.join(characters)}. Сказка должна быть примерно {story_length} слов в длину."
+    user_message = "Начни сказку."
 
-    # Настройка клиента для работы с локальной LLM
-    client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
-
-    # Формирование запроса к LLM
-    prompt = f"Создай сказку с персонажами: {', '.join(characters)}. Сказка должна быть примерно {story_length} слов в длину."
-
+    prompt_data = build_json_payload(model_uri, temperature, max_tokens, system_message, user_message)
+    
     try:
-        async for chunk in client.astream(prompt):
-            print(chunk, end="|", flush=True)  # Отладочный вывод
-            await websocket.send_text(chunk)
-
+        await send_completion_request(IAM_TOKEN, FOLDER_ID, prompt_data, websocket)
     except Exception as e:
         raise ValueError(f"Error generating story: {str(e)}")
