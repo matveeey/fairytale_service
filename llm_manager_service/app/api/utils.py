@@ -39,8 +39,16 @@ async def send_completion_request(iam_token, folder_id, prompt_data, websocket):
             if response.status == 200:
                 async for chunk in response.content.iter_any():
                     chunk_str = chunk.decode('utf-8')
-                    print(chunk_str, end="|", flush=True)  # Отладочный вывод
-                    await websocket.send_text(chunk_str)
+                    try:
+                        chunk_json = json.loads(chunk_str)
+                        if "result" in chunk_json and "alternatives" in chunk_json["result"]:
+                            for alternative in chunk_json["result"]["alternatives"]:
+                                if "message" in alternative and "text" in alternative["message"]:
+                                    message_text = alternative["message"]["text"]
+                                    await websocket.send_text(message_text)
+                                    print(message_text, end="|", flush=True)  # Отладочный вывод
+                    except json.JSONDecodeError:
+                        print(f"Failed to decode JSON: {chunk_str}")
             else:
                 raise Exception(f"Request failed with status code {response.status}: {await response.text()}")
 
