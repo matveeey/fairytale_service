@@ -1,3 +1,4 @@
+<!doctype html>
 <html>
     <head>
         <meta charset="UTF-8">
@@ -8,12 +9,14 @@
     <body>
         <div class="container">
             <h1>Story Generator</h1>
-            <textarea id="characters" placeholder="Введите имена персонажей через запятую..."></textarea>
+            <textarea id="characters" placeholder="Enter character names separated by commas..."></textarea>
             <div class="controls">
-                <button onclick="generateStory()">Generate</button>
+              <button onclick="generateStory()">Generate</button>
+              <button id="copy-btn" style="display: none;" onclick="copyToClipboard()">Copy</button>
             </div>
-            <pre id="output"></pre>
-        </div>
+            <div id="output"></div>
+          </div>
+        
 
         <script src="/static/script.js"></script>
     </body>
