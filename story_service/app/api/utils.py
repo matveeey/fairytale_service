@@ -2,7 +2,7 @@ import requests
 
 def execute_request(characters):
     # Отправка запроса к llm_manager_service
-    response = requests.post('http://localhost:8001/api/generate_story', json={
+    response = requests.post('http://localhost:8002/api/generate_story', json={
         "characters": ", ".join(characters)
     })
 

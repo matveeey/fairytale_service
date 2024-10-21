@@ -1,4 +1,4 @@
-const socket = new WebSocket('ws://localhost:8001/api/generate_story');
+const socket = new WebSocket('ws://localhost:8002/api/generate_story');
 const output = document.getElementById('output');
 const copyBtn = document.getElementById('copy-btn');
 

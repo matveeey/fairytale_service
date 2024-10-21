@@ -14,7 +14,7 @@ def execute_request(token):
     headers = {
         "Authorization": f"Bearer {token}"
     }
-    response = requests.post('http://localhost:8001/api/generate_story', headers=headers)
+    response = requests.post('http://localhost:8002/api/generate_story', headers=headers)
 
     if response.status_code != 200:
         raise ValueError("Error generating story")

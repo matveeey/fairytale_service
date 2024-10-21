@@ -1,6 +1,7 @@
 import os
 import aiohttp
 import json
+import redis
 
 def build_json_payload(model_uri, temperature, max_tokens, system_message, user_message):
     return {
@@ -50,8 +51,10 @@ async def send_completion_request(iam_token, folder_id, prompt_data, websocket):
                 raise Exception(f"Request failed with status code {response.status}: {await response.text()}")
 
 async def generate_story(characters, websocket):
-    IAM_TOKEN = os.environ["IAM_TOKEN"]
-    FOLDER_ID = os.environ["FOLDER_ID"]
+    IAM_TOKEN = redis.Redis(host='redis', port=6379, db=0).get('IAM_TOKEN').decode('utf-8')
+    FOLDER_ID = redis.Redis(host='redis', port=6379, db=0).get('FOLDER_ID').decode('utf-8')
+    # IAM_TOKEN = os.environ["IAM_TOKEN"]
+    # FOLDER_ID = os.environ["FOLDER_ID"]
     # Задаем значения по умолчанию для длины сказки
     model_uri = f"gpt://{FOLDER_ID}/yandexgpt-lite"
     temperature = 0.6

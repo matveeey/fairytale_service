@@ -28,3 +28,8 @@ services:
     depends_on:
       - story_service
       - llm_manager_service
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
