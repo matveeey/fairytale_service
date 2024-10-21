@@ -1,10 +1,7 @@
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from app.api.utils import execute_request
-from pydantic import BaseModel
-
-class CharacterRequest(BaseModel):
-    characters: str
+from .schemas import CharacterRequest
 
 router = APIRouter(prefix='', tags=['API'])
 templates = Jinja2Templates(directory='app/templates')

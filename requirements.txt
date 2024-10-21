@@ -2,7 +2,10 @@ fastapi[all]
 requests
 httpx
 pydantic
-openai
-streamlit
-langchain
-langchain_openai
+schedule
+os
+time
+jwt
+asyncio
+aiohttp
+websockets
