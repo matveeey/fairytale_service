@@ -7,11 +7,11 @@ services:
     ports:
       - 8001:8000
 
-  llm_access_service:
-    build: ./llm_access_service
+  yc_access_service:
+    build: ./yc_access_service
     command: python app/main.py
     volumes:
-      - ./llm_access_service/:/app/
+      - ./yc_access_service/:/app/
     ports:
       - 8003:8000
 
@@ -31,7 +31,7 @@ services:
       - ./nginx_config.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - story_service
-      - llm_access_service
+      - yc_access_service
       - llm_manager_service
 
   redis:
