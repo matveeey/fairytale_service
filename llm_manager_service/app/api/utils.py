@@ -35,6 +35,7 @@ async def send_completion_request(iam_token, folder_id, prompt_data, websocket):
     async with aiohttp.ClientSession() as session:
         async with session.post(url, headers=headers, json=prompt_data) as response:
             if response.status == 200:
+                previous_message_length = 0
                 async for chunk in response.content.iter_any():
                     chunk_str = ""
                     try:
@@ -47,8 +48,15 @@ async def send_completion_request(iam_token, folder_id, prompt_data, websocket):
                             for alternative in chunk_json["result"]["alternatives"]:
                                 if "message" in alternative and "text" in alternative["message"]:
                                     message_text = alternative["message"]["text"]
+
+                                    # We should remember current length of a chunk arrived
+                                    curr_len = len(message_text)
+                                    message_text = message_text[previous_message_length:]
+                                    
+                                    previous_message_length = curr_len
+                                    
+                                    print(message_text, end="|", flush=True)
                                     await websocket.send_text(message_text)
-                                    # print(message_text, end="|", flush=True)
                     except json.JSONDecodeError:
                         print(f"Failed to decode JSON: {chunk_str}")
             else:
@@ -62,8 +70,14 @@ async def generate_story(characters, websocket):
     model_uri = f"gpt://{FOLDER_ID}/yandexgpt-lite"
     temperature = 0.6
     max_tokens = "2000"
-    story_length = 300
-    system_message = f"Создай сказку с персонажами: {', '.join(characters)}. Сказка должна быть примерно {story_length} слов в длину."
+    story_length = 100
+    system_message =    f'''
+                            Создай сказку с персонажами: {', '.join(characters)}. Сказка должна быть примерно {story_length} слов в длину.
+                            Также расставь place-holders для иллюстраций к происходящим событиям. Их должно быть 3-5 на весь текст.
+                            Расположи их равномерно по тексту.
+                            Обозначь эти place-holders с помощью символа **?**
+                            НИКАКИМ ОБРАЗОМ кроме символа для place-holders не упоминай наличие иллюстраций в тексте.
+                        '''
     user_message = "Начни сказку."
 
     prompt_data = build_json_payload(model_uri, temperature, max_tokens, system_message, user_message)

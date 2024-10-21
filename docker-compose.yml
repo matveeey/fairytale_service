@@ -12,8 +12,6 @@ services:
     command: python app/main.py
     volumes:
       - ./yc_access_service/:/app/
-    ports:
-      - 8003:8000
 
   llm_manager_service:
     build: ./llm_manager_service
@@ -22,6 +20,14 @@ services:
       - ./llm_manager_service/:/app/
     ports:
       - 8002:8000
+
+  vlm_manager_service:
+    build: ./vlm_manager_service
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    volumes:
+      - ./vlm_manager_service/:/app/
+    ports:
+      - 8003:8000
 
   nginx:
     image: nginx:latest

@@ -154,17 +154,21 @@
         <!-- TMP fix:  -->
         <!-- <script src="/static/script.js"></script> -->
         <script>
-          const socket = new WebSocket('ws://localhost:8002/api/generate_story');
+          const storySocket = new WebSocket('ws://localhost:8002/api/generate_story');
+          const imageSocket = new WebSocket('ws://localhost:8002/api/generate_image');
           const output = document.getElementById('output');
           const copyBtn = document.getElementById('copy-btn');
+          
+          // Segment that just been generated and arrived to websocket
+          let currentSegment = null;
 
-          socket.onmessage = function(event) {
+          storySocket.onmessage = function(event) {
               const chunk = event.data;
               output.innerHTML += chunk;
               copyBtn.style.display = 'block'; // Displaying 'Copy' button
           };
 
-          socket.onclose = function(event) {
+          storySocket.onclose = function(event) {
               if (output.innerHTML.trim() !== '') {
                   copyBtn.style.display = 'block'; // Displaying 'Copy' button
               }
@@ -174,7 +178,7 @@
               const characters = document.getElementById('characters').value;
               output.innerHTML = "";
               output.textContent.replaceAll("");
-              socket.send(JSON.stringify({ characters: characters }));
+              storySocket.send(JSON.stringify({ characters: characters }));
           }
 
           function copyToClipboard() {
