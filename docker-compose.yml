@@ -6,8 +6,14 @@ services:
       - ./story_service/:/app/
     ports:
       - 8001:8000
-    environment:
-      - IAM_TOKEN=""
+
+  llm_access_service:
+    build: ./llm_access_service
+    command: python app/main.py
+    volumes:
+      - ./llm_access_service/:/app/
+    ports:
+      - 8003:8000
 
   llm_manager_service:
     build: ./llm_manager_service
@@ -16,8 +22,6 @@ services:
       - ./llm_manager_service/:/app/
     ports:
       - 8002:8000
-    environment:
-      - IAM_TOKEN=""
 
   nginx:
     image: nginx:latest
@@ -27,6 +31,7 @@ services:
       - ./nginx_config.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - story_service
+      - llm_access_service
       - llm_manager_service
 
   redis:

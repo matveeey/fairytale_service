@@ -1,3 +1,4 @@
-fastapi[all]
-pydantic
-aiohttp
+schedule
+jwt
+requests
+redis

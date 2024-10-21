@@ -1,5 +1,7 @@
 FROM python:3.10-slim
 
+ENV YC_KEYS_PATH=/app/keys/_keys.json
+
 WORKDIR /app
 
 COPY ./requirements.txt /app/requirements.txt

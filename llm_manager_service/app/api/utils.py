@@ -36,7 +36,11 @@ async def send_completion_request(iam_token, folder_id, prompt_data, websocket):
         async with session.post(url, headers=headers, json=prompt_data) as response:
             if response.status == 200:
                 async for chunk in response.content.iter_any():
-                    chunk_str = chunk.decode('utf-8')
+                    chunk_str = ""
+                    try:
+                        chunk_str = chunk.decode('utf-8')
+                    except UnicodeDecodeError as e:
+                        print(f'Failed to decode chunk. Info: {e}')
                     try:
                         chunk_json = json.loads(chunk_str)
                         if "result" in chunk_json and "alternatives" in chunk_json["result"]:
@@ -44,7 +48,7 @@ async def send_completion_request(iam_token, folder_id, prompt_data, websocket):
                                 if "message" in alternative and "text" in alternative["message"]:
                                     message_text = alternative["message"]["text"]
                                     await websocket.send_text(message_text)
-                                    print(message_text, end="|", flush=True)  # Отладочный вывод
+                                    # print(message_text, end="|", flush=True)
                     except json.JSONDecodeError:
                         print(f"Failed to decode JSON: {chunk_str}")
             else:
@@ -53,9 +57,8 @@ async def send_completion_request(iam_token, folder_id, prompt_data, websocket):
 async def generate_story(characters, websocket):
     IAM_TOKEN = redis.Redis(host='redis', port=6379, db=0).get('IAM_TOKEN').decode('utf-8')
     FOLDER_ID = redis.Redis(host='redis', port=6379, db=0).get('FOLDER_ID').decode('utf-8')
-    # IAM_TOKEN = os.environ["IAM_TOKEN"]
-    # FOLDER_ID = os.environ["FOLDER_ID"]
-    # Задаем значения по умолчанию для длины сказки
+
+    # Set the length of a fairytale
     model_uri = f"gpt://{FOLDER_ID}/yandexgpt-lite"
     temperature = 0.6
     max_tokens = "2000"
