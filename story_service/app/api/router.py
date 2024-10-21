@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException
-from fastapi.templating import Jinja2Templates, Jinja2Static
+from fastapi.templating import Jinja2Templates
 from app.api.utils import execute_request
 from .schemas import CharacterRequest
 
