@@ -1,6 +1,7 @@
 import os
 import aiohttp
 import json
+import asyncio
 import redis
 
 def build_json_payload(model_uri, seed, aspect_ratio, text):
@@ -68,20 +69,22 @@ async def send_generation_request(iam_token, folder_id, prompt_data, websocket):
             else:
                 raise Exception(f"Request failed with status code {response.status}: {await response.text()}")
 
-async def generate_image(description, websocket):
+async def generate_image(prompt, websocket):
     IAM_TOKEN = redis.Redis(host='redis', port=6379, db=0).get('IAM_TOKEN').decode('utf-8')
     FOLDER_ID = redis.Redis(host='redis', port=6379, db=0).get('FOLDER_ID').decode('utf-8')
 
     # Payload
-    model_uri = "art://b1gd3nac4uq97p8qfl66/yandex-art/latest"
+    model_uri = f"art://{FOLDER_ID}/yandex-art/latest"
     seed = "1863"
     aspect_ratio = {
         "widthRatio": "2",
         "heightRatio": "1"
     }
-    description_json = json.loads(description)
-    text = description_json["prompt"]
-    print(text, flush=True)
+    text = prompt
+    # print(text, flush=True)
+
+    # Limitations are 500 tokens per prompt
+    text = text[:500]
 
     prompt_data = build_json_payload(model_uri, seed, aspect_ratio, text)
     
@@ -89,6 +92,3 @@ async def generate_image(description, websocket):
         await send_generation_request(IAM_TOKEN, FOLDER_ID, prompt_data, websocket)
     except Exception as e:
         print(f"Error generating image: {e}")
-        
-if __name__ == "__main__":
-	print(f"[DEBUG] Image Generator started", flush=True)

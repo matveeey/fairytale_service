@@ -20,4 +20,4 @@ async def generate_story_endpoint(websocket: WebSocket):
             await generate_story(character_list, websocket)
 
     except WebSocketDisconnect:
-        print("WebSocket disconnected")
+        print("llm_service: WebSocket disconnected")

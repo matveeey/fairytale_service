@@ -10,7 +10,7 @@ async def generate_image_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_json()
-            description = data.get('description')
+            description = data.get('prompt')
             if not description:
                 await websocket.send_json({"error": "No description provided"})
                 continue
@@ -18,4 +18,4 @@ async def generate_image_endpoint(websocket: WebSocket):
             await generate_image(description, websocket)
 
     except WebSocketDisconnect:
-        print("WebSocket disconnected")
+        print("vlm_service: WebSocket disconnected")
