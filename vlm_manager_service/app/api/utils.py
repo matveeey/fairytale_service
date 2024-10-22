@@ -19,7 +19,7 @@ def build_json_payload(model_uri, seed, aspect_ratio, text):
         ]
     }
 
-async def get_generation_result(iam_token, request_id, websocket):
+async def get_generation_result(iam_token, request_id, websocket, image_id):
     url = f"https://llm.api.cloud.yandex.net:443/operations/{request_id}"
     
     headers = {
@@ -37,7 +37,10 @@ async def get_generation_result(iam_token, request_id, websocket):
                         image_base64 = response_data.get("response", {}).get("image")
                         if image_base64:
                             print("Image generation completed.", flush=True)
-                            await websocket.send_text(image_base64)
+                            await websocket.send_text(json.dumps({
+                                "id": image_id,
+                                "image_base64": image_base64
+                            }))
                             return
                         else:
                             print("Image generation failed.", flush=True)
@@ -49,7 +52,7 @@ async def get_generation_result(iam_token, request_id, websocket):
                 else:
                     raise Exception(f"Request failed with status code {response.status}: {await response.text()}")
                 
-async def send_generation_request(iam_token, folder_id, prompt_data, websocket):
+async def send_generation_request(iam_token, folder_id, prompt_data, websocket, image_id):
     url = "https://llm.api.cloud.yandex.net/foundationModels/v1/imageGenerationAsync"
     
     headers = {
@@ -65,11 +68,11 @@ async def send_generation_request(iam_token, folder_id, prompt_data, websocket):
                 request_id = response_data.get("id")
                 print(f"Request ID: {request_id}", flush=True)
                 
-                await get_generation_result(iam_token, request_id, websocket)
+                await get_generation_result(iam_token, request_id, websocket, image_id)
             else:
                 raise Exception(f"Request failed with status code {response.status}: {await response.text()}")
 
-async def generate_image(prompt, websocket):
+async def generate_image(prompt, websocket, image_id):
     IAM_TOKEN = redis.Redis(host='redis', port=6379, db=0).get('IAM_TOKEN').decode('utf-8')
     FOLDER_ID = redis.Redis(host='redis', port=6379, db=0).get('FOLDER_ID').decode('utf-8')
 
@@ -89,6 +92,6 @@ async def generate_image(prompt, websocket):
     prompt_data = build_json_payload(model_uri, seed, aspect_ratio, text)
     
     try:
-        await send_generation_request(IAM_TOKEN, FOLDER_ID, prompt_data, websocket)
+        await send_generation_request(IAM_TOKEN, FOLDER_ID, prompt_data, websocket, image_id)
     except Exception as e:
         print(f"Error generating image: {e}")

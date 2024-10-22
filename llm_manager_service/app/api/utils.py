@@ -63,7 +63,7 @@ async def send_completion_request(iam_token, folder_id, prompt_data, websocket):
                 raise Exception(f"Request failed with status code {response.status}: {await response.text()}")
 
 async def generate_story(characters, websocket):
-    print(f"Story generator started", flush=True)
+    print(f"[DEBUG] generate_story called", flush=True)
     IAM_TOKEN = redis.Redis(host='redis', port=6379, db=0).get('IAM_TOKEN').decode('utf-8')
     FOLDER_ID = redis.Redis(host='redis', port=6379, db=0).get('FOLDER_ID').decode('utf-8')
 

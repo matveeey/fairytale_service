@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Story Generator</title>
+        <title>Fairytale Generator</title>
 
         <!-- TMP fix:  -->
         <!-- <link rel="stylesheet" type="text/css" href="/static/style.css"> -->
@@ -162,7 +162,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
           }
 
-          @media (max-width: 768px) {
+          @media (max-width: 1000px) {
             .story-segment {
               flex-direction: column;
             }
@@ -196,32 +196,34 @@
       
           // Segment that just been generated and arrived to websocket
           let currentSegment = null;
+          let segmentIdCounter = 0;
       
           storySocket.onmessage = function(event) {
-              const chunk = event.data;
-              if (!currentSegment) {
-                  currentSegment = createStorySegment();
-                  output.appendChild(currentSegment);
-              }
-              currentSegment.querySelector('.story-text').innerHTML += chunk;
-      
-              // If the chunk contains "**?**", request an image
-              if (chunk.includes('**?**')) {
-                  const textBeforeImage = currentSegment.querySelector('.story-text').textContent;
-                  requestImage(textBeforeImage);
-                  currentSegment = null;
-              }
+            const chunk = event.data;
+            if (!currentSegment) {
+                currentSegment = createStorySegment();
+                output.appendChild(currentSegment);
+            }
+            currentSegment.querySelector('.story-text').innerHTML += chunk;
+    
+            // If the chunk contains "**?**", request an image
+            if (chunk.includes('**?**')) {
+                const textBeforeImage = currentSegment.querySelector('.story-text').textContent;
+                requestImage(textBeforeImage, currentSegment.id);
+                currentSegment = null;
+            }
           };
       
           imageSocket.onmessage = function(event) {
-              console.log(`Received message imageSocket`);
-              const imageBase64 = event.data;
-              const lastSegment = output.lastElementChild;
-              console.log(`imageBase64: ${imageBase64}`);
-              if (lastSegment) {
-                  const imageElement = lastSegment.querySelector('.story-image');
-                  imageElement.innerHTML = `<img src="data:image/png;base64,${imageBase64}" alt="Story illustration">`;
-              }
+            console.log(`Received image`)
+            const { id, image_base64 } = JSON.parse(event.data);
+            const segment = document.getElementById(id) //output.lastElementChild;
+            console.log(`    Received image id: ${id}`)
+            console.log(`    Raw data: ${event.data}`)
+            if (segment) {
+                const imageElement = segment.querySelector('.story-image');
+                imageElement.innerHTML = `<img src="data:image/png;base64,${image_base64}" alt="Story illustration">`;
+            }
           };
           
           imageSocket.onerror = function(event) {
@@ -237,32 +239,33 @@
           };
 
           storySocket.onclose = function(event) {
-              console.log(`CLOSING STORY SOCKET`);
-              if (output.innerHTML.trim() !== '') {
-                  copyBtn.style.display = 'block'; // Displaying 'Copy' button
-              }
+            console.log(`CLOSING STORY SOCKET`);
+            if (output.innerHTML.trim() !== '') {
+                copyBtn.style.display = 'block'; // Displaying 'Copy' button
+            }
           };
       
           function createStorySegment() {
-              const segment = document.createElement('div');
-              segment.className = 'story-segment';
-              segment.innerHTML = `
-                  <div class="story-text"></div>
-                  <div class="story-image">Image generating...</div>
-              `;
-              return segment;
+            const segment = document.createElement('div');
+            segment.className = 'story-segment';
+            segment.id = `${segmentIdCounter++}`;
+            segment.innerHTML = `
+                <div class="story-text"></div>
+                <div class="story-image">Image generating...</div>
+            `;
+            return segment;
           }
       
-          function requestImage(text) {
-              console.log(`requestImage: ${JSON.stringify({ prompt: text })}`);
-              imageSocket.send(JSON.stringify({ prompt: text }));
+          function requestImage(text, segmentId) {
+            console.log(`Requested image ${segmentId}`)
+            imageSocket.send(JSON.stringify({ id: segmentId, prompt: text }));
           }
       
           async function generateStory() {
-              const characters = document.getElementById('characters').value;
-              output.innerHTML = ''; // Clear the output before generating a new story
-              currentSegment = null; // Reset the current segment
-              storySocket.send(JSON.stringify({ characters: characters }));
+            const characters = document.getElementById('characters').value;
+            output.innerHTML = ''; // Clear the output before generating a new story
+            currentSegment = null; // Reset the current segment
+            storySocket.send(JSON.stringify({ characters: characters }));
           }
         </script>
       </body>
