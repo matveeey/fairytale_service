@@ -12,6 +12,8 @@ services:
     command: python app/main.py
     volumes:
       - ./yc_access_service/:/app/
+    environment:
+      - YC_KEYS_PATH=app/keys/_keys.json
 
   llm_manager_service:
     build: ./llm_manager_service

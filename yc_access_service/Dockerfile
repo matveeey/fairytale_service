@@ -1,6 +1,6 @@
 FROM python:3.10-slim
 
-ENV YC_KEYS_PATH=/app/keys/_keys.json
+ENV YC_KEYS_PATH=${YC_KEYS_PATH}
 
 WORKDIR /app
 

@@ -22,11 +22,8 @@
             color: var(--text-color);
             background-color: var(--background-color);
             margin: 0;
-            padding: 0;
+            padding: 20px;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
           }
 
           .container {
@@ -35,8 +32,8 @@
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            max-width: 800px;
-            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
           }
 
           h1 {
@@ -49,7 +46,7 @@
 
           textarea {
             width: 100%;
-            height: 150px;
+            height: 100px;
             margin-bottom: 20px;
             padding: 15px;
             border: 2px solid var(--secondary-color);
@@ -94,24 +91,56 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
           }
 
-          #output {
+          #output-container {
+            position: relative;
             background-color: var(--background-color);
             border: 2px solid var(--secondary-color);
             border-radius: 15px;
             padding: 20px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            position: relative;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            min-height: 200px;
-            max-height: 400px;
+            min-height: 400px;
             overflow-y: auto;
-            color: var(--text-color);
           }
 
-          .copy-btn {
+          #output {
+            font-family: 'Georgia', serif;
+            font-size: 18px;
+            color: var(--text-color);
+            line-height: 1.8;
+          }
+
+          .story-segment {
+            display: flex;
+            margin-bottom: 30px;
+            align-items: flex-start;
+          }
+
+          .story-text {
+            flex: 1;
+            padding-right: 20px;
+          }
+
+          .story-image {
+            width: 300px;
+            height: 200px;
+            background-color: #f0f0f0;
+            border: 2px solid var(--secondary-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-style: italic;
+            color: #888;
+          }
+
+          .story-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+          }
+
+          #copy-btn {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -123,18 +152,24 @@
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: none;
           }
 
-          .copy-btn:hover {
+          #copy-btn:hover {
             background-color: var(--secondary-color);
             color: var(--primary-color);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
           }
 
-          @media (max-width: 600px) {
-            .container {
-              padding: 20px;
+          @media (max-width: 768px) {
+            .story-segment {
+              flex-direction: column;
+            }
+
+            .story-image {
+              width: 100%;
+              margin-top: 20px;
             }
           }
         </style>
@@ -155,39 +190,79 @@
         <!-- <script src="/static/script.js"></script> -->
         <script>
           const storySocket = new WebSocket('ws://localhost:8002/api/generate_story');
-          const imageSocket = new WebSocket('ws://localhost:8002/api/generate_image');
+          const imageSocket = new WebSocket('ws://localhost:8003/api/generate_image');
           const output = document.getElementById('output');
           const copyBtn = document.getElementById('copy-btn');
-          
+      
           // Segment that just been generated and arrived to websocket
           let currentSegment = null;
-
+      
           storySocket.onmessage = function(event) {
               const chunk = event.data;
-              output.innerHTML += chunk;
-              copyBtn.style.display = 'block'; // Displaying 'Copy' button
+              if (!currentSegment) {
+                  currentSegment = createStorySegment();
+                  output.appendChild(currentSegment);
+              }
+              currentSegment.querySelector('.story-text').innerHTML += chunk;
+      
+              // If the chunk contains "**?**", request an image
+              if (chunk.includes('**?**')) {
+                  const textBeforeImage = currentSegment.querySelector('.story-text').textContent;
+                  requestImage(textBeforeImage);
+                  currentSegment = null;
+              }
+          };
+      
+          imageSocket.onmessage = function(event) {
+              console.log(`Received message imageSocket`);
+              const imageBase64 = event.data;
+              const lastSegment = output.lastElementChild;
+              console.log(`imageBase64: ${imageBase64}`);
+              if (lastSegment) {
+                  const imageElement = lastSegment.querySelector('.story-image');
+                  imageElement.innerHTML = `<img src="data:image/png;base64,${imageBase64}" alt="Story illustration">`;
+              }
+          };
+          
+          imageSocket.onerror = function(event) {
+            console.log(`error image SOCKET`);
+          };
+
+          imageSocket.onclose = function(event) {
+              console.log(`CLOSING image SOCKET`);
+          };
+
+          storySocket.onerror = function(event) {
+            console.log(`error story SOCKET`);
           };
 
           storySocket.onclose = function(event) {
+              console.log(`CLOSING STORY SOCKET`);
               if (output.innerHTML.trim() !== '') {
                   copyBtn.style.display = 'block'; // Displaying 'Copy' button
               }
           };
-
+      
+          function createStorySegment() {
+              const segment = document.createElement('div');
+              segment.className = 'story-segment';
+              segment.innerHTML = `
+                  <div class="story-text"></div>
+                  <div class="story-image">Image generating...</div>
+              `;
+              return segment;
+          }
+      
+          function requestImage(text) {
+              console.log(`requestImage: ${JSON.stringify({ prompt: text })}`);
+              imageSocket.send(JSON.stringify({ prompt: text }));
+          }
+      
           async function generateStory() {
               const characters = document.getElementById('characters').value;
-              output.innerHTML = "";
-              output.textContent.replaceAll("");
+              output.innerHTML = ''; // Clear the output before generating a new story
+              currentSegment = null; // Reset the current segment
               storySocket.send(JSON.stringify({ characters: characters }));
-          }
-
-          function copyToClipboard() {
-              const textToCopy = output.textContent.trim();
-              navigator.clipboard.writeText(textToCopy).then(() => {
-                  alert('Result copied to clipboard!');
-              }, (err) => {
-                  console.error('Failed to copy text: ', err);
-              });
           }
         </script>
       </body>

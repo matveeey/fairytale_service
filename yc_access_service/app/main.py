@@ -94,12 +94,14 @@ class IamTokenRetriever:
 		redis_client.set('IAM_TOKEN', iam_token)
 		redis_client.set('FOLDER_ID', self._folder_id)
 
-		print(f"[DEBUG] fetch_iam_token: setted up IAM token")
+		print(f"[DEBUG] fetch_iam_token: setted up IAM token", flush=True)
 
 	def run(self):
 		# TODO: make it env var
 		# Scheduling requesting IAM token for each 59 minutes
 		schedule.every(59).minutes.do(self.fetch_iam_token)
+
+		self.fetch_iam_token()
 
 		while True:
 			schedule.run_pending()

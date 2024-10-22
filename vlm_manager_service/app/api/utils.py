@@ -18,7 +18,7 @@ def build_json_payload(model_uri, seed, aspect_ratio, text):
         ]
     }
 
-async def get_generation_result(iam_token, request_id):
+async def get_generation_result(iam_token, request_id, websocket):
     url = f"https://llm.api.cloud.yandex.net:443/operations/{request_id}"
     
     headers = {
@@ -30,20 +30,25 @@ async def get_generation_result(iam_token, request_id):
             async with session.get(url, headers=headers) as response:
                 if response.status == 200:
                     response_data = await response.json()
-                    image_base64 = response_data.get("response", {}).get("image")
+                    done = response_data.get("done", False)
                     
-                    if image_base64:
-                        print("Image generation completed.")
-                        save_image(image_base64)
-                        return
+                    if done:
+                        image_base64 = response_data.get("response", {}).get("image")
+                        if image_base64:
+                            print("Image generation completed.", flush=True)
+                            await websocket.send_text(image_base64)
+                            return
+                        else:
+                            print("Image generation failed.", flush=True)
+                            return
                     else:
-                        print("Image generation is still in progress.")
-                        await asyncio.sleep(10)
-                        print("Retrying in 10 seconds...")
+                        print("Image generation is still in progress.", flush=True)
+                        await asyncio.sleep(3)
+                        print("Retrying in 3 seconds...", flush=True)
                 else:
                     raise Exception(f"Request failed with status code {response.status}: {await response.text()}")
-
-async def send_generation_request(iam_token, folder_id, prompt_data):
+                
+async def send_generation_request(iam_token, folder_id, prompt_data, websocket):
     url = "https://llm.api.cloud.yandex.net/foundationModels/v1/imageGenerationAsync"
     
     headers = {
@@ -57,13 +62,9 @@ async def send_generation_request(iam_token, folder_id, prompt_data):
             if response.status == 200:
                 response_data = await response.json()
                 request_id = response_data.get("id")
-                print(f"Request ID: {request_id}")
+                print(f"Request ID: {request_id}", flush=True)
                 
-                # Wait for 10 seconds before the result
-                # See: https://yandex.cloud/ru/docs/foundation-models/quickstart/yandexart
-                await asyncio.sleep(10)
-                
-                await get_generation_result(iam_token, request_id)
+                await get_generation_result(iam_token, request_id, websocket)
             else:
                 raise Exception(f"Request failed with status code {response.status}: {await response.text()}")
 
@@ -78,12 +79,16 @@ async def generate_image(description, websocket):
         "widthRatio": "2",
         "heightRatio": "1"
     }
-    text = description
+    description_json = json.loads(description)
+    text = description_json["prompt"]
+    print(text, flush=True)
 
     prompt_data = build_json_payload(model_uri, seed, aspect_ratio, text)
     
     try:
-        await send_generation_request(IAM_TOKEN, FOLDER_ID, prompt_data)
+        await send_generation_request(IAM_TOKEN, FOLDER_ID, prompt_data, websocket)
     except Exception as e:
         print(f"Error generating image: {e}")
         
+if __name__ == "__main__":
+	print(f"[DEBUG] Image Generator started", flush=True)

@@ -55,7 +55,7 @@ async def send_completion_request(iam_token, folder_id, prompt_data, websocket):
                                     
                                     previous_message_length = curr_len
                                     
-                                    print(message_text, end="|", flush=True)
+                                    # print(message_text, end="|", flush=True)
                                     await websocket.send_text(message_text)
                     except json.JSONDecodeError:
                         print(f"Failed to decode JSON: {chunk_str}")
@@ -63,6 +63,7 @@ async def send_completion_request(iam_token, folder_id, prompt_data, websocket):
                 raise Exception(f"Request failed with status code {response.status}: {await response.text()}")
 
 async def generate_story(characters, websocket):
+    print(f"Story generator started", flush=True)
     IAM_TOKEN = redis.Redis(host='redis', port=6379, db=0).get('IAM_TOKEN').decode('utf-8')
     FOLDER_ID = redis.Redis(host='redis', port=6379, db=0).get('FOLDER_ID').decode('utf-8')
 
