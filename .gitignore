@@ -3,3 +3,4 @@ env/
 **/*.pyc
 *_keys.json
 README.md
+compose/

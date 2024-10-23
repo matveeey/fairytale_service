@@ -176,7 +176,7 @@
     </head>
     <body>
         <div class="container">
-            <h1>Story Generator</h1>
+            <h1>Fairytale Generator</h1>
             <textarea id="characters" placeholder="Enter character names separated by commas..."></textarea>
             <div class="controls">
               <button onclick="generateStory()">Generate</button>
@@ -189,8 +189,8 @@
         <!-- TMP fix:  -->
         <!-- <script src="/static/script.js"></script> -->
         <script>
-          const storySocket = new WebSocket('ws://localhost:8002/api/generate_story');
-          const imageSocket = new WebSocket('ws://localhost:8003/api/generate_image');
+          const storySocket = new WebSocket('ws://matveymatvey.ru/api/generate_story');
+          const imageSocket = new WebSocket('ws://matveymatvey.ru/api/generate_image');
           const output = document.getElementById('output');
           const copyBtn = document.getElementById('copy-btn');
       
@@ -200,16 +200,28 @@
       
           storySocket.onmessage = function(event) {
             const chunk = event.data;
+            let chunkToAppend = '';
             if (!currentSegment) {
                 currentSegment = createStorySegment();
                 output.appendChild(currentSegment);
             }
-            currentSegment.querySelector('.story-text').innerHTML += chunk;
-    
-            // If the chunk contains "**?**", request an image
-            if (chunk.includes('**?**')) {
+
+            chunkToAppend = chunk;
+            let needImage = false;
+            // If the chunk contains "<IMAGE_PLACEHOLDER>", request an image
+            if (chunk.includes('<IMAGE_PLACEHOLDER>')) {
+              chunkToAppend = chunk.replace('<IMAGE_PLACEHOLDER>', '');
+              needImage = true;
+            }
+            currentSegment.querySelector('.story-text').innerHTML += chunkToAppend;
+            
+            if (needImage) {
+                currentSegment.innerHTML += `
+                    <div class="story-image">Image generating...</div>
+                `;
+                console.log(`REQUESTED IMAGE`)
                 const textBeforeImage = currentSegment.querySelector('.story-text').textContent;
-                requestImage(textBeforeImage, currentSegment.id);
+                requestImage(textBeforeImage, currentSegment.id);                
                 currentSegment = null;
             }
           };
@@ -251,7 +263,6 @@
             segment.id = `${segmentIdCounter++}`;
             segment.innerHTML = `
                 <div class="story-text"></div>
-                <div class="story-image">Image generating...</div>
             `;
             return segment;
           }
