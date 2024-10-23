@@ -1,4 +1,11 @@
 fastapi[all]
 requests
 httpx
-curl_fetch2py
+pydantic
+schedule
+os
+time
+jwt
+asyncio
+aiohttp
+websockets
