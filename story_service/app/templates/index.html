@@ -50,6 +50,14 @@
             text-shadow: 2px 2px 4px rgba(255,215,0,0.3);
         }
 
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.5em; /* Decrease font size on mobiles */
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+        }
+
         textarea {
             width: 100%;
             height: 100px;
@@ -64,6 +72,12 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             box-shadow: 0 0 10px rgba(255, 174, 0, 0.5); /* Glow effect */
+        }
+
+        @media (max-width: 640px) {
+            textarea {
+                font-size: 14px; /* Decrease font size on mobiles */
+            }
         }
 
         textarea:focus {
@@ -90,6 +104,12 @@
             font-weight: bold;
             text-transform: uppercase;
             box-shadow: 0 0 10px rgba(255, 174, 0, 0.5); /* Glow effect */
+        }
+
+        @media (max-width: 640px) {
+            button {
+                font-size: 16px; /* Decrease font size on mobiles   */
+            }
         }
 
         button:hover {
@@ -165,6 +185,12 @@
             transition: all 0.3s ease;
             display: none;
             box-shadow: 0 0 10px rgba(255, 174, 0, 0.5); /* Glow effect */
+        }
+
+        @media (max-width: 640px) {
+            #copy-btn {
+                font-size: 12px; /* Decrease font size on mobiles   */
+            }
         }
 
         #copy-btn:hover {
@@ -270,7 +296,12 @@
             col *= brightness;
             
             // Add trippy stars
-            for (float i = 0.0; i < 100.0; i++) {
+            float starCount = 50.0; // Decrease starts amount on mobiles  
+            if (resolution.x < 640.0) {
+                starCount = 25.0;
+            }
+
+            for (float i = 0.0; i < starCount; i++) {
                 vec2 starPos = vec2(rand(vec2(i, 0.0)) * 2.0 - 1.0, rand(vec2(0.0, i)) * 2.0 - 1.0);
                 starPos = rotate(starPos, time * starSpeed * (rand(vec2(i)) - 0.5));
                 
@@ -291,7 +322,11 @@
                 starBrightness *= star;
                 
                 // Apply star size
-                starBrightness *= smoothstep(starSize, 0.0, starDist);
+                float starSizeFactor = starSize;
+                if (resolution.x < 640.0) {
+                    starSizeFactor *= 0.5; // Decrease star size on mobiles  
+                }
+                starBrightness *= smoothstep(starSizeFactor, 0.0, starDist);
                 
                 // Apply twinkle effect
                 float twinkle = sin(time * 10.0 + i * 1000.0) * 0.5 + 0.5;
@@ -359,6 +394,7 @@
         init();
         animate();
     </script>
+    
         <!-- TMP fix:  -->
         <!-- <script src="/static/script.js"></script> -->
         <script>
@@ -381,11 +417,21 @@
 
             chunkToAppend = chunk;
             let needImage = false;
-            // If the chunk contains "<IMAGE_PLACEHOLDER>", request an image
-            if (chunk.includes('<IMAGE_PLACEHOLDER>')) {
-              chunkToAppend = chunk.replace('<IMAGE_PLACEHOLDER>', '');
+            // If the chunk contains "@", request an image
+            if (chunk.includes('@')) {
+              chunkToAppend = chunk.replace('@', '');
               needImage = true;
             }
+            // Clear the junk symbols
+            if (chunk.includes('#')) {
+              chunkToAppend = chunk.replace('#', '');
+              needImage = true;
+            }
+            if (chunk.includes('*')) {
+              chunkToAppend = chunk.replace('*', '');
+              needImage = true;
+            }
+
             currentSegment.querySelector('.story-text').innerHTML += chunkToAppend;
             
             if (needImage) {
