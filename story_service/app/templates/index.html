@@ -424,12 +424,13 @@
             }
             // Clear the junk symbols
             if (chunk.includes('#')) {
-              chunkToAppend = chunk.replace('#', '');
-              needImage = true;
+              chunkToAppend = chunkToAppend.replace('#', '');
             }
             if (chunk.includes('*')) {
-              chunkToAppend = chunk.replace('*', '');
-              needImage = true;
+              chunkToAppend = chunkToAppend.replace('*', '');
+            }
+            if (chunk.includes('@')) {
+              chunkToAppend = chunkToAppend.replace('@', '');
             }
 
             currentSegment.querySelector('.story-text').innerHTML += chunkToAppend;
