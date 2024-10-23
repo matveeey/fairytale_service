@@ -2,6 +2,5 @@ env/
 **/__pycache__/
 **/*.pyc
 *_keys.json
-README.md
 compose/
 .env
