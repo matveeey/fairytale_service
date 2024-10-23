@@ -4,3 +4,4 @@ env/
 *_keys.json
 README.md
 compose/
+.env
