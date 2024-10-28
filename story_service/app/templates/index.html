@@ -42,6 +42,30 @@
             z-index: 1; /* Ensure the container is above the background */
         }
 
+        .credits {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.5rem;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .credits a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+        }
+
+        .credits a:hover {
+            text-decoration: underline;
+        }
+
+        .credits {
+            font-size: 0.7rem;
+        }
+
         h1 {
             color: var(--secondary-color);
             text-align: center;
@@ -231,6 +255,12 @@
             <button id="copy-btn" style="display: none;" onclick="copyToClipboard()">Copy</button>
         </div>
         <div id="output"></div>
+    </div>
+
+    <!-- Credits Section -->
+    <div class="credits">
+        <p>dev: Matvey Zaikov</p>
+        <p>link: <a href="https://github.com/matveeey/fairytale_service">Github</a></p>
     </div>
 
     <!-- Three.js and dat.GUI -->
