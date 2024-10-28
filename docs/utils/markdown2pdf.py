@@ -1,21 +1,8 @@
 from markdown_pdf import MarkdownPdf, Section
 
 pdf = MarkdownPdf(toc_level=2)
-# pdf.add_section(Section("# _\n", toc=False))
-# pdf.add_section(
-#   Section("# Head1\n\n![python](img/python.png)\n\nbody\n"),
-#   user_css="h1 {text-align:center;}"
-# )
-# pdf.add_section(Section("## Head2\n\n### Head3\n\n", paper_size="A4-L"))
-# text = """# Section with Table
 
-# |TableHeader1|TableHeader2|
-# |--|--|
-# |Text1|Text2|
-# |ListCell|<ul><li>FirstBullet</li><li>SecondBullet</li></ul>|
-# """
-
-# pdf.add_section(Section(text))
+pdf = MarkdownPdf()
 
 user_text="""
 # Отчёт
