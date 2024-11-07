@@ -1,0 +1,3 @@
+[submodule "painter_service"]
+	path = painter_service
+	url = git@github.com:matveeey/web-painter.git
