@@ -1,0 +1,5 @@
+services:
+  painter_service:
+    extends:
+      file: ./painter_service/docker-compose.yml
+      service: painter_service
