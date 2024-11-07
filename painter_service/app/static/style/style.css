@@ -1,0 +1,78 @@
+body { margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+    canvas { display: block; }
+    
+    .toolbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: #c0c0c0;
+        border-bottom: 3px solid #808080;
+        padding: 10px;
+        display: flex;
+        gap: 10px;
+        box-shadow: inset 2px 2px #ffffff, inset -2px -2px #404040;
+    }
+    
+    .tool-btn {
+        background: #c0c0c0;
+        border: 3px solid #ffffff;
+        border-right-color: #404040;
+        border-bottom-color: #404040;
+        padding: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        image-rendering: pixelated;
+    }
+    
+    .tool-btn.active {
+        border: 3px solid #404040;
+        border-right-color: #ffffff;
+        border-bottom-color: #ffffff;
+        background: #d4d4d4;
+    }
+
+    .tool-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .color-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: 20px;
+        padding: 5px;
+        background: #d4d4d4;
+        border: 2px solid #808080;
+    }
+
+    .color-preview {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #ffffff;
+        border-right-color: #404040;
+        border-bottom-color: #404040;
+    }
+
+    .color-picker {
+        height: 40px;
+        width: 40px;
+        padding: 0;
+        border: 3px solid #ffffff;
+        border-right-color: #404040;
+        border-bottom-color: #404040;
+        cursor: pointer;
+    }
+
+    .section-label {
+        font-family: 'MS Sans Serif', Arial, sans-serif;
+        font-size: 14px;
+        color: #000000;
+        text-shadow: 1px 1px #ffffff;
+        margin-right: 10px;
+    }
