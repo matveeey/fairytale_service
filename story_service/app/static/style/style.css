@@ -227,7 +227,7 @@ button:hover {
     z-index: -1; /* Ensure the background is behind the content */
 }
 
-/* Добавляем шапку */
+/* Header */
 .header {
     position: fixed;
     top: 0;

@@ -1,206 +1,206 @@
 <!doctype html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fairytale Generator</title>
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Press Start 2P:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/story_generator/static/style/style.css">
-    <!-- Icons -->
-    <link rel="icon" type="image/svg+xml" href="/story_generator/static/icons/favicon.ico" />
-    <link rel="apple-touch-icon" href="/story_generator/static/icons/apple-touch-icon.png" />
-</head>
-<body class="bg-black text-white">
-    <!-- Добавляем шапку -->
-    <div class="header">
-        <a href="/">На главную</a>
-    </div>
-
-    <div id="container" class="w-full h-screen"></div>
-    <div class="container">
-        <h1>Fairytale Generator</h1>
-        <textarea id="characters" placeholder="Введите имена героев через запятую..."></textarea>
-        <div class="controls">
-            <button onclick="generateStory()">Генерировать</button>
-            <button id="copy-btn" style="display: none;" onclick="copyToClipboard()">Copy</button>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Fairytale Generator</title>
+        <!-- Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Press Start 2P:wght@400;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+        <!-- Tailwind CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/story_generator/static/style/style.css">
+        <!-- Icons -->
+        <link rel="icon" type="image/svg+xml" href="/story_generator/static/icons/favicon.ico" />
+        <link rel="apple-touch-icon" href="/story_generator/static/icons/apple-touch-icon.png" />
+    </head>
+    <body class="bg-black text-white">
+        <!-- Header -->
+        <div class="header">
+            <a href="/">Main page</a>
         </div>
-        <div id="output"></div>
-    </div>
 
-    <!-- Credits Section -->
-    <div class="credits">
-        <p>dev: Matvey Zaikov</p>
-        <p>link: <a href="https://github.com/matveeey/fairytale_service">Github</a></p>
-    </div>
+        <div id="container" class="w-full h-screen"></div>
+        <div class="container">
+            <h1>Fairytale Generator</h1>
+            <textarea id="characters" placeholder="Введите имена героев через запятую..."></textarea>
+            <div class="controls">
+                <button onclick="generateStory()">Генерировать</button>
+                <button id="copy-btn" style="display: none;" onclick="copyToClipboard()">Copy</button>
+            </div>
+            <div id="output"></div>
+        </div>
 
-    <!-- Three.js and dat.GUI -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
+        <!-- Credits Section -->
+        <div class="credits">
+            <p>dev: Matvey Zaikov</p>
+            <p>link: <a href="https://github.com/matveeey/fairytale_service">Github</a></p>
+        </div>
 
-    <script src="/story_generator/static/js/script.js"></script>
+        <!-- Three.js and dat.GUI -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
 
-    <script id="vertexShader" type="x-shader/x-vertex">
-        uniform float time;
-        varying vec2 vUv;
-        varying vec3 vPosition;
-        void main() {
-            vUv = uv;
-            vPosition = position;
-            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-            gl_Position = projectionMatrix * mvPosition;
-        }
-    </script>
-    <script id="fragmentShader" type="x-shader/x-fragment">
-        uniform float time;
-        uniform vec2 resolution;
-        uniform float speed;
-        uniform float density;
-        uniform float brightness;
-        uniform float starDensity;
-        uniform float starSpeed;
-        uniform float starSize;
-        uniform float starTwinkle;
-        varying vec2 vUv;
-        varying vec3 vPosition;
+        <script src="/story_generator/static/js/script.js"></script>
 
-        float rand(vec2 co) {
-            return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
-        }
-
-        vec2 rotate(vec2 v, float a) {
-            float s = sin(a);
-            float c = cos(a);
-            mat2 m = mat2(c, -s, s, c);
-            return m * v;
-        }
-
-        void main() {
-            vec2 uv = gl_FragCoord.xy / resolution.xy;
-            uv = uv * 2.0 - 1.0;
-            uv.x *= resolution.x / resolution.y;
-            
-            float t = time * speed;
-            
-            float r = length(uv);
-            float a = atan(uv.y, uv.x);
-            
-            float f = density * abs(0.1 + sin(a * 3.0 + t + sin(r * 5.0 + t * 2.0)));
-            
-            vec3 col = vec3(0.0);
-            
-            if (mod(f, 0.2) < 0.1) {
-                col = vec3(1.0, 0.0, 0.0); // Red
-            } else {
-                col = vec3(0.0, 1.0, 0.0); // Lime Green
+        <script id="vertexShader" type="x-shader/x-vertex">
+            uniform float time;
+            varying vec2 vUv;
+            varying vec3 vPosition;
+            void main() {
+                vUv = uv;
+                vPosition = position;
+                vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                gl_Position = projectionMatrix * mvPosition;
             }
-            
-            col *= smoothstep(0.2, 0.1, abs(r - f));
-            col *= brightness;
-            
-            // Add trippy stars
-            float starCount = 50.0; // Decrease starts amount on mobiles  
-            if (resolution.x < 640.0) {
-                starCount = 25.0;
+        </script>
+        <script id="fragmentShader" type="x-shader/x-fragment">
+            uniform float time;
+            uniform vec2 resolution;
+            uniform float speed;
+            uniform float density;
+            uniform float brightness;
+            uniform float starDensity;
+            uniform float starSpeed;
+            uniform float starSize;
+            uniform float starTwinkle;
+            varying vec2 vUv;
+            varying vec3 vPosition;
+
+            float rand(vec2 co) {
+                return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
             }
 
-            for (float i = 0.0; i < starCount; i++) {
-                vec2 starPos = vec2(rand(vec2(i, 0.0)) * 2.0 - 1.0, rand(vec2(0.0, i)) * 2.0 - 1.0);
-                starPos = rotate(starPos, time * starSpeed * (rand(vec2(i)) - 0.5));
+            vec2 rotate(vec2 v, float a) {
+                float s = sin(a);
+                float c = cos(a);
+                mat2 m = mat2(c, -s, s, c);
+                return m * v;
+            }
+
+            void main() {
+                vec2 uv = gl_FragCoord.xy / resolution.xy;
+                uv = uv * 2.0 - 1.0;
+                uv.x *= resolution.x / resolution.y;
                 
-                // Make stars move in a spiral pattern
-                float spiral = sin(time * 0.5 + i * 0.1) * 0.5 + 0.5;
-                starPos *= spiral;
+                float t = time * speed;
                 
-                float starDist = length(uv - starPos);
+                float r = length(uv);
+                float a = atan(uv.y, uv.x);
                 
-                // Create pulsating star effect
-                float pulse = sin(time * 5.0 + i) * 0.5 + 0.5;
-                float starBrightness = smoothstep(0.05 * starDensity * pulse, 0.0, starDist);
+                float f = density * abs(0.1 + sin(a * 3.0 + t + sin(r * 5.0 + t * 2.0)));
                 
-                // Create star shape
-                float rays = 5.0;
-                float angle = atan(uv.y - starPos.y, uv.x - starPos.x);
-                float star = cos(angle * rays) * 0.5 + 0.5;
-                starBrightness *= star;
+                vec3 col = vec3(0.0);
                 
-                // Apply star size
-                float starSizeFactor = starSize;
-                if (resolution.x < 640.0) {
-                    starSizeFactor *= 0.5; // Decrease star size on mobiles  
+                if (mod(f, 0.2) < 0.1) {
+                    col = vec3(1.0, 0.0, 0.0); // Red
+                } else {
+                    col = vec3(0.0, 1.0, 0.0); // Lime Green
                 }
-                starBrightness *= smoothstep(starSizeFactor, 0.0, starDist);
                 
-                // Apply twinkle effect
-                float twinkle = sin(time * 10.0 + i * 1000.0) * 0.5 + 0.5;
-                starBrightness *= mix(1.0, twinkle, starTwinkle);
+                col *= smoothstep(0.2, 0.1, abs(r - f));
+                col *= brightness;
                 
-                vec3 starColor = (rand(vec2(i)) > 0.5) ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+                // Add trippy stars
+                float starCount = 50.0; // Decrease starts amount on mobiles  
+                if (resolution.x < 640.0) {
+                    starCount = 25.0;
+                }
+
+                for (float i = 0.0; i < starCount; i++) {
+                    vec2 starPos = vec2(rand(vec2(i, 0.0)) * 2.0 - 1.0, rand(vec2(0.0, i)) * 2.0 - 1.0);
+                    starPos = rotate(starPos, time * starSpeed * (rand(vec2(i)) - 0.5));
+                    
+                    // Make stars move in a spiral pattern
+                    float spiral = sin(time * 0.5 + i * 0.1) * 0.5 + 0.5;
+                    starPos *= spiral;
+                    
+                    float starDist = length(uv - starPos);
+                    
+                    // Create pulsating star effect
+                    float pulse = sin(time * 5.0 + i) * 0.5 + 0.5;
+                    float starBrightness = smoothstep(0.05 * starDensity * pulse, 0.0, starDist);
+                    
+                    // Create star shape
+                    float rays = 5.0;
+                    float angle = atan(uv.y - starPos.y, uv.x - starPos.x);
+                    float star = cos(angle * rays) * 0.5 + 0.5;
+                    starBrightness *= star;
+                    
+                    // Apply star size
+                    float starSizeFactor = starSize;
+                    if (resolution.x < 640.0) {
+                        starSizeFactor *= 0.5; // Decrease star size on mobiles  
+                    }
+                    starBrightness *= smoothstep(starSizeFactor, 0.0, starDist);
+                    
+                    // Apply twinkle effect
+                    float twinkle = sin(time * 10.0 + i * 1000.0) * 0.5 + 0.5;
+                    starBrightness *= mix(1.0, twinkle, starTwinkle);
+                    
+                    vec3 starColor = (rand(vec2(i)) > 0.5) ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
+                    
+                    // Add color variation
+                    starColor = mix(starColor, vec3(1.0), sin(time + i) * 0.5 + 0.5);
+                    
+                    col += starColor * starBrightness;
+                }
                 
-                // Add color variation
-                starColor = mix(starColor, vec3(1.0), sin(time + i) * 0.5 + 0.5);
-                
-                col += starColor * starBrightness;
+                gl_FragColor = vec4(col, 1.0);
             }
-            
-            gl_FragColor = vec4(col, 1.0);
-        }
-    </script>
-    <script>
-        let scene, camera, renderer, uniforms;
+        </script>
+        <script>
+            let scene, camera, renderer, uniforms;
 
-        function init() {
-            scene = new THREE.Scene();
-            camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-            renderer = new THREE.WebGLRenderer();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.getElementById('container').appendChild(renderer.domElement);
+            function init() {
+                scene = new THREE.Scene();
+                camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+                renderer = new THREE.WebGLRenderer();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.getElementById('container').appendChild(renderer.domElement);
 
-            const geometry = new THREE.PlaneGeometry(2, 2);
-            const material = new THREE.ShaderMaterial({
-                uniforms: {
-                    time: { value: 0 },
-                    resolution: { value: new THREE.Vector2() },
-                    speed: { value: 0.5 }, // Tunnel Speed
-                    density: { value: 5.0 }, // Tunnel Density
-                    brightness: { value: 1.0 }, // Tunnel Brightness
-                    starDensity: { value: 1.0 }, // Star Density
-                    starSpeed: { value: 0.2 }, // Star Speed
-                    starSize: { value: 0.05 }, // Star Size
-                    starTwinkle: { value: 0.5 } // Star Twinkle
-                },
-                vertexShader: document.getElementById('vertexShader').textContent,
-                fragmentShader: document.getElementById('fragmentShader').textContent
-            });
+                const geometry = new THREE.PlaneGeometry(2, 2);
+                const material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                        resolution: { value: new THREE.Vector2() },
+                        speed: { value: 0.5 }, // Tunnel Speed
+                        density: { value: 5.0 }, // Tunnel Density
+                        brightness: { value: 1.0 }, // Tunnel Brightness
+                        starDensity: { value: 1.0 }, // Star Density
+                        starSpeed: { value: 0.2 }, // Star Speed
+                        starSize: { value: 0.05 }, // Star Size
+                        starTwinkle: { value: 0.5 } // Star Twinkle
+                    },
+                    vertexShader: document.getElementById('vertexShader').textContent,
+                    fragmentShader: document.getElementById('fragmentShader').textContent
+                });
 
-            uniforms = material.uniforms;
+                uniforms = material.uniforms;
 
-            const mesh = new THREE.Mesh(geometry, material);
-            scene.add(mesh);
+                const mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
 
-            onWindowResize();
-            window.addEventListener('resize', onWindowResize, false);
-        }
+                onWindowResize();
+                window.addEventListener('resize', onWindowResize, false);
+            }
 
-        function onWindowResize() {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            uniforms.resolution.value.x = renderer.domElement.width;
-            uniforms.resolution.value.y = renderer.domElement.height;
-        }
+            function onWindowResize() {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                uniforms.resolution.value.x = renderer.domElement.width;
+                uniforms.resolution.value.y = renderer.domElement.height;
+            }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            uniforms.time.value += 0.05;
-            renderer.render(scene, camera);
-        }
+            function animate() {
+                requestAnimationFrame(animate);
+                uniforms.time.value += 0.05;
+                renderer.render(scene, camera);
+            }
 
-        init();
-        animate();
-    </script>
-    
-</body>
+            init();
+            animate();
+        </script>
+        
+    </body>
 </html>
