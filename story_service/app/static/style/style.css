@@ -35,7 +35,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     color: rgba(255, 255, 255, 0.5);
-    font-size: 0.5rem; /* Устанавливаем нужный размер шрифта */
+    font-size: 0.5rem;
     text-align: center;
     z-index: 2;
 }
