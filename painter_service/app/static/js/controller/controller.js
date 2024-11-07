@@ -8,8 +8,8 @@ export class SceneController {
 
         this.model.addLights();
         this.model.loadMeshAndTexture(
-            '/static/3d/meshes/simple-stone/textures/Material_108_baseColor.jpeg',
-            '/static/3d/meshes/simple-stone/scene.gltf'
+            '/painter/static/3d/meshes/simple-stone/textures/Material_108_baseColor.jpeg',
+            '/painter/static/3d/meshes/simple-stone/scene.gltf'
         );
         this.model.animate();
     }

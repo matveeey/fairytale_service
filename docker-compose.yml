@@ -15,7 +15,7 @@ services:
     volumes:
       - ./painter_service/:/app/
     ports:
-      - 8000:8000
+      - 8004:8000
 
   story_service:
     build: ./story_service
