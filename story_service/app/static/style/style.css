@@ -1,0 +1,251 @@
+:root {
+    --primary-color: #ffae00; /* Yellow */
+    --secondary-color: #000000; /* Black */
+    --background-color: #ffbb00; /* White */
+    --text-color: #000000; /* Yellow */
+    --border-color: #ffbb00;
+}
+
+body {
+    font-family: 'Press Start 2P', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background-color: rgba(255, 240, 158, 0.85); /* 85% transparent */
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    max-width: 1000px;
+    margin: 0 auto;
+    z-index: 1; /* Ensure the container is above the background */
+}
+
+.credits {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.5rem; /* Устанавливаем нужный размер шрифта */
+    text-align: center;
+    z-index: 2;
+}
+
+.credits a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+}
+
+.credits a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    color: var(--secondary-color);
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(255,215,0,0.3);
+}
+
+@media (max-width: 640px) {
+    h1 {
+        font-size: 1.5em; /* Decrease font size on mobiles */
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 2px solid var(--secondary-color);
+    border-radius: 15px;
+    resize: vertical;
+    font-size: 16px;
+    background-color: rgba(255, 237, 155, 0.65); /* 85% transparent */
+    color: var(--text-color);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(255, 174, 0, 0.5); /* Glow effect */
+}
+
+@media (max-width: 640px) {
+    textarea {
+        font-size: 14px; /* Decrease font size on mobiles */
+    }
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 20px rgba(255, 174, 0, 0.7); /* Enhanced glow effect */
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 15px 25px;
+    border: 2px solid var(--secondary-color);
+    border-radius: 15px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 174, 0, 0.85); /* 85% transparent */
+    color: var(--secondary-color);
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0 0 10px rgba(255, 174, 0, 0.5); /* Glow effect */
+}
+
+@media (max-width: 640px) {
+    button {
+        font-size: 16px; /* Decrease font size on mobiles   */
+    }
+}
+
+button:hover {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+#output-container {
+    position: relative;
+    background-color: var(--background-color);
+    border: 2px solid var(--secondary-color);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    min-height: 400px;
+    overflow-y: auto;
+}
+
+#output {
+    font-family: 'Nunito', serif;
+    font-size: 18px;
+    color: var(--text-color);
+    line-height: 1.8;
+}
+
+.story-segment {
+    display: flex;
+    flex-direction: column; /* Change to column to place image below text */
+    margin-bottom: 30px;
+    align-items: flex-start;
+}
+
+.story-text {
+    flex: 1;
+    padding-right: 20px;
+}
+
+.story-image {
+    width: 100%; /* Full width of the parent */
+    height: auto; /* Auto height to fit the image */
+    background-color: rgba(240, 240, 240, 0.85); /* 85% transparent */
+    border: 2px solid var(--secondary-color);
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-style: italic;
+    color: #888;
+    overflow: hidden; /* Ensure the image does not overflow */
+    margin-top: 20px; /* Add margin to separate image from text */
+}
+
+.story-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+#copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 174, 0, 0.85); /* 85% transparent */
+    color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
+    border-radius: 8px;
+    padding: 8px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: none;
+    box-shadow: 0 0 10px rgba(255, 174, 0, 0.5); /* Glow effect */
+}
+
+@media (max-width: 640px) {
+    #copy-btn {
+        font-size: 12px; /* Decrease font size on mobiles   */
+    }
+}
+
+#copy-btn:hover {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 1000px) {
+    .story-segment {
+        flex-direction: column;
+    }
+
+    .story-image {
+        width: 100%;
+        margin-top: 20px;
+    }
+}
+
+#container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Ensure the background is behind the content */
+}
+
+/* Добавляем шапку */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    text-align: center;
+    z-index: 10;
+}
+
+.header a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.header a:hover {
+    text-decoration: underline;
+}

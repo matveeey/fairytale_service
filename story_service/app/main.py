@@ -5,7 +5,6 @@ from app.api.router import router as router_api
 
 app = FastAPI()
 
-# TODO: fixme
-# app.mount('/static', StaticFiles(directory='app/static'), 'static')
+app.mount('/static', StaticFiles(directory='app/static'), 'static')
 
 app.include_router(router_api)
